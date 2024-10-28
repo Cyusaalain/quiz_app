@@ -6,6 +6,8 @@ from models import User
 from flask import request, redirect, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import User  # Import User after db initialization to avoid circular import
+from functools import wraps
+from flask import abort
 
 # Initialize the Flask app and configuration
 app = Flask(__name__)
@@ -25,6 +27,19 @@ def home():
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or current_user.role != 'admin':
+            return abort(403)  # Forbidden access
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route('/admin')
+@admin_required
+def admin_dashboard():
+    return "Welcome to the Admin Dashboard!"
 
 # register routes
 @app.route('/register', methods=['GET', 'POST'])
