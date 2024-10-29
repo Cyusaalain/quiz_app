@@ -4,7 +4,7 @@ from extensions import db, login_manager
 from flask_login import login_user, logout_user, login_required, current_user, UserMixin
 from models import User
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import User  
+from models import User, Module, Assessment, Question
 from functools import wraps
 from flask import abort
 
