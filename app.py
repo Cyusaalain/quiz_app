@@ -10,12 +10,11 @@ from flask import abort
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
-    
-    id = db.Column(db.Integer, primary_key=True, extend_existing=True)
-    name = db.Column(db.String(100), nullable=False, extend_existing=True)
-    email = db.Column(db.String(150), unique=True, nullable=False, extend_existing=True)
-    password = db.Column(db.String(150), nullable=False, extend_existing=True)
-    role = db.Column(db.String(50), default="user", extend_existing=True)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(150), unique=True, nullable=False)
+    password = db.Column(db.String(150), nullable=False)
+    role = db.Column(db.String(50), default="user")
 
 class Module(db.Model):
     __tablename__ = 'modules'
@@ -179,5 +178,6 @@ def user_dashboard():
 
 if __name__ == '__main__':
     with app.app_context():
+        db.metadata.clear()
         db.create_all()
     app.run(debug=True)
