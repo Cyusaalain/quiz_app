@@ -21,74 +21,87 @@ login_manager.init_app(app)
 # Define a simple route to test
 @app.route('/')
 def home():
-    return "Welcome to the Quiz App!"
+    return render_template('home.html')
 
 # Load user function for Flask-Login
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or current_user.role != 'admin':
-            return abort(403)  # Forbidden access
-        return f(*args, **kwargs)
-    return decorated_function
+@app.route('/admin_login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        user = User.query.filter_by(email=email, role='admin').first()
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for('admin_dashboard'))
+        else:
+            flash('Invalid admin credentials.')
+    return render_template('admin_login.html')
 
-@app.route('/admin')
-@admin_required
-def admin_dashboard():
-    return "Welcome to the Admin Dashboard!"
+@app.route('/user_login', methods=['GET', 'POST'])
+def user_login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        user = User.query.filter_by(email=email, role='user').first()
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for('user_dashboard'))
+        else:
+            flash('Invalid user credentials.')
+    return render_template('user_login.html')
 
-# register routes
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
-        
-        # Check if the email is already registered
-        user = User.query.filter_by(email=email).first()
-        if user:
+
+        if User.query.filter_by(email=email).first():
             flash('Email address already exists.')
             return redirect(url_for('register'))
 
-        # Add new user to the database
         new_user = User(
-            name=name, 
+            name=name,
             email=email,
-            password=generate_password_hash(password, method='pbkdf2:sha256')
+            password=generate_password_hash(password, method='pbkdf2:sha256'),
+            role='user'
         )
         db.session.add(new_user)
         db.session.commit()
 
         flash('Registration successful! Please log in.')
-        return redirect(url_for('login'))
+        return redirect(url_for('user_login'))
 
     return render_template('register.html')
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-        
-        user = User.query.filter_by(email=email).first()
-        if user and check_password_hash(user.password, password):
-            login_user(user)
-            return redirect(url_for('home'))
-        else:
-            flash('Login unsuccessful. Check email and password.')
-
-    return render_template('login.html')
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('home'))
+
+#admin dashboard
+@app.route('/admin_dashboard')
+@login_required
+def admin_dashboard():
+    if current_user.role != 'admin':
+        return redirect(url_for('home'))
+    return "Welcome to the Admin Dashboard!"
+
+#user dashboard
+@app.route('/user_dashboard')
+@login_required
+def user_dashboard():
+    if current_user.role != 'user':
+        return redirect(url_for('home'))
+    return "Welcome to the User Dashboard!"
 
 # Only run the server if this script is executed directly
 if __name__ == '__main__':
