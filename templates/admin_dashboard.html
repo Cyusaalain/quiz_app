@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+    <a href="{{ url_for('create_module') }}">Create New Module</a>
+    <ul>
+        {% for module in modules %}
+            <li>
+                <strong>{{ module.title }}</strong> - {{ module.description }}
+                <a href="{{ url_for('create_assessment', module_id=module.id) }}">Add Assessment</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('home') }}">Back to Home</a>
+</body>
+</html>
