@@ -14,7 +14,7 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
-    role = db.Column(db.String(50), default="user")
+    role = db.Column(db.String(50), default="user", extend_existing=True)
 
 class Module(db.Model):
     __tablename__ = 'modules'
@@ -43,7 +43,7 @@ class Question(db.Model):
 # Initialize the Flask app and configuration
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quiz_app.db'
-app.config['SECRET_KEY'] = 'your_secret_key'  # Replace with a strong key
+app.config['SECRET_KEY'] = 'your_secret_key'
 
 # Initialize extensions
 db.init_app(app)
