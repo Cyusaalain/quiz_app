@@ -192,11 +192,11 @@ def delete_assessment(assessment_id):
         return redirect(url_for('home'))
     
     assessment = Assessment.query.get_or_404(assessment_id)
-    module_id = assessment.module_id
     db.session.delete(assessment)
     db.session.commit()
-    flash(f'Assessment "{assessment.title}" has been deleted.')
-    return redirect(url_for('module_dashboard', module_id=module_id))
+    
+    flash('Assessment deleted successfully!', 'success')
+    return redirect(url_for('module_dashboard', module_id=assessment.module_id))
 
 # User dashboard
 @app.route('/user_dashboard')
