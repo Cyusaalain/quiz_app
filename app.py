@@ -117,7 +117,31 @@ def create_module():
     
     return render_template('create_module.html')
 
-# Create assessment for a specific module (Admin only)
+# Deleting a module (Admin only)
+@app.route('/delete_module/<int:module_id>', methods=['POST'])
+@login_required
+def delete_module(module_id):
+    if current_user.role != 'admin':
+        return redirect(url_for('home'))
+    
+    module = Module.query.get_or_404(module_id)
+    db.session.delete(module)
+    db.session.commit()
+    flash(f'Module "{module.title}" has been deleted.')
+    return redirect(url_for('admin_dashboard'))
+
+#  Module Dashboard with all assessments for a specific module
+@app.route('/module_dashboard/<int:module_id>', methods=['GET'])
+@login_required
+def module_dashboard(module_id):
+    if current_user.role != 'admin':
+        return redirect(url_for('home'))
+    
+    module = Module.query.get_or_404(module_id)
+    assessments = Assessment.query.filter_by(module_id=module.id).all()
+    return render_template('module_dashboard.html', module=module, assessments=assessments)
+
+# Redirect back to the module dashboard after creating a new assessment
 @app.route('/module/<int:module_id>/create_assessment', methods=['GET', 'POST'])
 @login_required
 def create_assessment(module_id):
@@ -135,9 +159,44 @@ def create_assessment(module_id):
         db.session.add(new_assessment)
         db.session.commit()
         
-        return redirect(url_for('admin_dashboard'))
-    
+        flash('Assessment created successfully!')
+        return redirect(url_for('module_dashboard', module_id=module_id))  
     return render_template('create_assessment.html', module=module)
+
+# Redirect back to the module dashboard after editing an assessment
+@app.route('/edit_assessment/<int:assessment_id>', methods=['GET', 'POST'])
+@login_required
+def edit_assessment(assessment_id):
+    if current_user.role != 'admin':
+        return redirect(url_for('home'))
+    
+    assessment = Assessment.query.get_or_404(assessment_id)
+    module_id = assessment.module_id
+    
+    if request.method == 'POST':
+        assessment.title = request.form.get('title')
+        assessment.terms = request.form.get('terms')
+        assessment.time_limit = int(request.form.get('time_limit'))
+        
+        db.session.commit()
+        flash('Assessment updated successfully!')
+        return redirect(url_for('module_dashboard', module_id=module_id))
+    
+    return render_template('edit_assessment.html', assessment=assessment)
+
+# Redirect back to the module dashboard after deleting an assessment
+@app.route('/delete_assessment/<int:assessment_id>', methods=['POST'])
+@login_required
+def delete_assessment(assessment_id):
+    if current_user.role != 'admin':
+        return redirect(url_for('home'))
+    
+    assessment = Assessment.query.get_or_404(assessment_id)
+    module_id = assessment.module_id
+    db.session.delete(assessment)
+    db.session.commit()
+    flash(f'Assessment "{assessment.title}" has been deleted.')
+    return redirect(url_for('module_dashboard', module_id=module_id))
 
 # User dashboard
 @app.route('/user_dashboard')

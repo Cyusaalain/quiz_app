@@ -7,17 +7,17 @@
 <body>
     <h2>Create Assessment for Module: {{ module.title }}</h2>
     <form method="POST">
-        <label for="title">Title:</label>
-        <input type="text" name="title" required><br>
+        <label for="title">Title</label>
+        <input type="text" name="title" required>
         
-        <label for="terms">Terms and Conditions:</label>
-        <textarea name="terms"></textarea><br>
+        <label for="terms">Terms</label>
+        <textarea name="terms"></textarea>
         
-        <label for="time_limit">Time Limit (minutes):</label>
-        <input type="number" name="time_limit" required><br>
+        <label for="time_limit">Time Limit (minutes)</label>
+        <input type="number" name="time_limit" min="1" required>
         
         <button type="submit">Create Assessment</button>
     </form>
-    <a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+    <a href="{{ url_for('module_dashboard') }}">Back to Dashboard</a>
 </body>
 </html>
