@@ -1,42 +1,41 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, request, redirect, url_for, flash 
+from flask_sqlalchemy import SQLAlchemy 
 from extensions import db, login_manager 
-from flask_login import login_user, logout_user, login_required, current_user, UserMixin
-from models import User
-from werkzeug.security import generate_password_hash, check_password_hash
-from models import User, Module, Assessment, Question
-from functools import wraps
-from flask import abort
+from flask_login import login_user, logout_user, login_required, current_user, UserMixin 
+from models import User, Module, Assessment, Question 
+from werkzeug.security import generate_password_hash, check_password_hash 
+from functools import wraps 
+from flask import abort 
 
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(150), unique=True, nullable=False)
-    password = db.Column(db.String(150), nullable=False)
-    role = db.Column(db.String(50), default="user")
+class User(UserMixin, db.Model): 
+    id = db.Column(db.Integer, primary_key=True) 
+    name = db.Column(db.String(100), nullable=False) 
+    email = db.Column(db.String(150), unique=True, nullable=False) 
+    password = db.Column(db.String(150), nullable=False) 
+    role = db.Column(db.String(50), default="user") 
 
-class Module(db.Model):
-    __tablename__ = 'modules'
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text)
-    assessments = db.relationship('Assessment', backref='module', lazy=True)
+class Module(db.Model): 
+    __tablename__ = 'modules' 
+    id = db.Column(db.Integer, primary_key=True) 
+    title = db.Column(db.String(100), nullable=False) 
+    description = db.Column(db.Text) 
+    assessments = db.relationship('Assessment', backref='module', lazy=True) 
 
-class Assessment(db.Model):
-    __tablename__ = 'assessments'
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
-    terms = db.Column(db.Text, nullable=True)
-    time_limit = db.Column(db.Integer)  # Time limit in minutes
-    module_id = db.Column(db.Integer, db.ForeignKey('modules.id'), nullable=False)
-    questions = db.relationship('Question', backref='assessment', lazy=True)
+class Assessment(db.Model): 
+    __tablename__ = 'assessments' 
+    id = db.Column(db.Integer, primary_key=True) 
+    title = db.Column(db.String(100), nullable=False) 
+    terms = db.Column(db.Text, nullable=True) 
+    time_limit = db.Column(db.Integer) # Time limit in minutes 
+    module_id = db.Column(db.Integer, db.ForeignKey('modules.id'), nullable=False) 
+    questions = db.relationship('Question', backref='assessment', lazy=True) 
 
-class Question(db.Model):
-    __tablename__ = 'questions'
-    id = db.Column(db.Integer, primary_key=True)
-    question_text = db.Column(db.Text, nullable=False)
-    answer_options = db.Column(db.JSON)  # JSON field for multiple-choice options
-    correct_answer = db.Column(db.String(100), nullable=False)
+class Question(db.Model): 
+    __tablename__ = 'questions' 
+    id = db.Column(db.Integer, primary_key=True) 
+    question_text = db.Column(db.Text, nullable=False) 
+    answer_options = db.Column(db.JSON) # JSON field for multiple-choice options 
+    correct_answer = db.Column(db.String(100), nullable=False) 
     assessment_id = db.Column(db.Integer, db.ForeignKey('assessments.id'), nullable=False)
 
 # Initialize the Flask app and configuration
