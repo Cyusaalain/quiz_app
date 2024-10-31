@@ -14,7 +14,7 @@ app.config['SECRET_KEY'] = 'your_secret_key'
 db.init_app(app)
 login_manager.init_app(app)
 
-# Define a simple route to test
+# home
 @app.route('/')
 def home():
     return render_template('home.html')
