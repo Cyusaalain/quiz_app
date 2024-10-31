@@ -163,7 +163,7 @@ def create_assessment(module_id):
         return redirect(url_for('module_dashboard', module_id=module_id))  
     return render_template('create_assessment.html', module=module)
 
-# Redirect back to the module dashboard after editing an assessment
+# editing an assessment
 @app.route('/edit_assessment/<int:assessment_id>', methods=['GET', 'POST'])
 @login_required
 def edit_assessment(assessment_id):
@@ -171,20 +171,20 @@ def edit_assessment(assessment_id):
         return redirect(url_for('home'))
     
     assessment = Assessment.query.get_or_404(assessment_id)
-    module_id = assessment.module_id
+    module = assessment.module  # Fetch the related module
     
     if request.method == 'POST':
+        # Update assessment fields here
         assessment.title = request.form.get('title')
         assessment.terms = request.form.get('terms')
-        assessment.time_limit = int(request.form.get('time_limit'))
+        assessment.time_limit = request.form.get('time_limit')
         
         db.session.commit()
-        flash('Assessment updated successfully!')
-        return redirect(url_for('module_dashboard', module_id=module_id))
+        return redirect(url_for('module_dashboard', module_id=module.id))
     
-    return render_template('edit_assessment.html', assessment=assessment)
+    return render_template('edit_assessment.html', assessment=assessment, module=module)
 
-# Redirect back to the module dashboard after deleting an assessment
+#  deleting an assessment
 @app.route('/delete_assessment/<int:assessment_id>', methods=['POST'])
 @login_required
 def delete_assessment(assessment_id):
