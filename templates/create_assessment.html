@@ -18,6 +18,6 @@
         
         <button type="submit">Create Assessment</button>
     </form>
-    <a href="{{ url_for('module_dashboard') }}">Back to Dashboard</a>
+    <a href="{{ url_for('module_dashboard', module_id=module.id) }}">Back to Dashboard</a>
 </body>
 </html>
