@@ -185,18 +185,18 @@ def edit_assessment(assessment_id):
     return render_template('edit_assessment.html', assessment=assessment, module=module)
 
 #  deleting an assessment
-@app.route('/delete_assessment/<int:assessment_id>', methods=['POST'])
+@app.route('/delete_module/<int:module_id>', methods=['POST'])
 @login_required
-def delete_assessment(assessment_id):
+def delete_module(module_id):
     if current_user.role != 'admin':
         return redirect(url_for('home'))
     
-    assessment = Assessment.query.get_or_404(assessment_id)
-    db.session.delete(assessment)
+    module = Module.query.get_or_404(module_id)
+    db.session.delete(module)
     db.session.commit()
     
-    flash('Assessment deleted successfully!', 'success')
-    return redirect(url_for('module_dashboard', module_id=assessment.module_id))
+    flash('Module deleted successfully!', 'success')
+    return redirect(url_for('admin_dashboard'))
 
 # User dashboard
 @app.route('/user_dashboard')
