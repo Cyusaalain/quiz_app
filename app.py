@@ -13,7 +13,7 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
-    role = db.Column(db.String(50), default="user", extend_existing=True)
+    role = db.Column(db.String(50), default="user",)
 
 class Module(db.Model):
     __tablename__ = 'modules'
