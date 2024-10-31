@@ -1,6 +1,5 @@
 # models.py
 from extensions import db
-from flask_login import UserMixin
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -11,12 +10,14 @@ class User(db.Model):
     role = db.Column(db.String(50), default="user")
 
 class Module(db.Model):
+    __tablename__ = 'modules'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
     assessments = db.relationship('Assessment', backref='module', lazy=True)
 
 class Assessment(db.Model):
+    __tablename__ = 'assessments'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     terms = db.Column(db.Text, nullable=True)
@@ -25,6 +26,7 @@ class Assessment(db.Model):
     questions = db.relationship('Question', backref='assessment', lazy=True)
 
 class Question(db.Model):
+    __tablename__ = 'questions'
     id = db.Column(db.Integer, primary_key=True)
     question_text = db.Column(db.Text, nullable=False)
     answer_options = db.Column(db.JSON)  # JSON field for multiple-choice options
