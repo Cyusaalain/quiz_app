@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>question-form</title>
+</head>
+<body>
+<h2>Add Questions to {{ assessment.title }}</h2>
+
+<form method="POST">
+    <div id="question-form">
+        <label for="question_text">Question:</label>
+        <textarea name="question_text" id="question_text" rows="3" required></textarea>
+
+        <h4>Answer Options</h4>
+        <div id="answer-options">
+            <div class="option">
+                <label for="answer_options">Option 1:</label>
+                <input type="text" name="answer_options" required>
+            </div>
+            <div class="option">
+                <label for="answer_options">Option 2:</label>
+                <input type="text" name="answer_options" required>
+            </div>
+        </div>
+        <button type="button" onclick="addOption()">Add another option</button>
+
+        <h4>Correct Answer</h4>
+        <input type="text" name="correct_answer" required>
+
+    </div>
+
+    <button type="submit" name="add_another">Add Question</button>
+    <button type="submit" name="submit">Submit Quiz</button>
+</form>
+
+<script>
+function addOption() {
+    const optionCount = document.querySelectorAll('#answer-options .option').length + 1;
+    const newOption = document.createElement('div');
+    newOption.classList.add('option');
+    newOption.innerHTML = `<label for="answer_options">Option ${optionCount}:</label>
+                           <input type="text" name="answer_options" required>`;
+    document.getElementById('answer-options').appendChild(newOption);
+}
+</script>
+
+{% endblock %}
+</body>
+</html>

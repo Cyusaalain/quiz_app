@@ -199,6 +199,42 @@ def delete_assessment(assessment_id):
     flash('Assessment deleted successfully!', 'success')
     return redirect(url_for('module_dashboard', module_id=assessment.module_id))
 
+#questions route
+@app.route('/assessment/<int:assessment_id>/add_questions', methods=['GET', 'POST'])
+@login_required
+def add_questions(assessment_id):
+    if current_user.role != 'admin':
+        return redirect(url_for('home'))
+    
+    assessment = Assessment.query.get_or_404(assessment_id)
+    
+    if request.method == 'POST':
+        question_text = request.form.get('question_text')
+        answer_options = request.form.getlist('answer_options')
+        correct_answer = request.form.get('correct_answer')
+        
+        new_question = Question(
+            question_text=question_text,
+            answer_options=answer_options,
+            correct_answer=correct_answer,
+            assessment=assessment
+        )
+        
+        db.session.add(new_question)
+        
+        # Check if they want to add more or submit
+        if 'add_another' in request.form:
+            db.session.commit()
+            flash('Question added. Add another question.', 'info')
+            return redirect(url_for('add_questions', assessment_id=assessment_id))
+        
+        if 'submit' in request.form:
+            db.session.commit()
+            flash('Quiz added successfully!', 'success')
+            return redirect(url_for('module_dashboard', module_id=assessment.module_id))
+    
+    return render_template('add_questions.html', assessment=assessment)
+
 # User dashboard
 @app.route('/user_dashboard')
 @login_required
@@ -210,5 +246,5 @@ def user_dashboard():
 # Run the app
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()  # Initialize the database tables if they don't exist
+        db.create_all() 
     app.run(debug=True)
