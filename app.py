@@ -142,26 +142,27 @@ def module_dashboard(module_id):
     assessments = Assessment.query.filter_by(module_id=module.id).all()
     return render_template('module_dashboard.html', module=module, assessments=assessments)
 
-# Redirect back to the module dashboard after creating a new assessment
+# creating a new assessment
 @app.route('/module/<int:module_id>/create_assessment', methods=['GET', 'POST'])
 @login_required
 def create_assessment(module_id):
     if current_user.role != 'admin':
         return redirect(url_for('home'))
-    
+
     module = Module.query.get_or_404(module_id)
-    
+
     if request.method == 'POST':
         title = request.form.get('title')
         terms = request.form.get('terms')
         time_limit = request.form.get('time_limit')
-        
+
         new_assessment = Assessment(title=title, terms=terms, time_limit=int(time_limit), module=module)
         db.session.add(new_assessment)
         db.session.commit()
-        
-        flash('Assessment created successfully!')
-        return redirect(url_for('module_dashboard', module_id=module_id))  
+
+        flash('Assessment created! You can now add questions.', 'success')
+        return redirect(url_for('add_questions', assessment_id=new_assessment.id))
+
     return render_template('create_assessment.html', module=module)
 
 # editing an assessment

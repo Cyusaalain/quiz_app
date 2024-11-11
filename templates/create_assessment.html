@@ -15,9 +15,10 @@
         
         <label for="time_limit">Time Limit (minutes)</label>
         <input type="number" name="time_limit" min="1" required>
-        
-        <button type="submit">Create Assessment</button>
     </form>
+    <div>
+    <a href="{{ url_for('add_questions', assessment_id=assessment.id) }}">Add Questions</a>
     <a href="{{ url_for('module_dashboard', module_id=module.id) }}">Back to Dashboard</a>
+    </div>
 </body>
 </html>
