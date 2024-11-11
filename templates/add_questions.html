@@ -7,7 +7,8 @@
 <body>
 <h2>Add Questions to {{ assessment.title }}</h2>
 
-<form method="POST" action="{{ url_for('add_questions', assessment_id=assessment.id) }}">
+<form method="POST" action="{{ url_for('add_questions', assessment_id=assessment.id) }}"> 
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="container mt-5">
         <h2 class="mb-4">Add Questions to Assessment: {{ assessment.title }}</h2>
         
@@ -33,7 +34,7 @@
         </div>
 
         <div class="mt-4">
-            <button type="submit" name="add_another" class="btn btn-primary">Add Question</button>
+            <button type="submit" name="add_another" class="btn btn-primary">Add Question</button> 
             <button type="submit" name="submit_final" class="btn btn-success">Submit and Finish</button>
         </div>
     </div>
