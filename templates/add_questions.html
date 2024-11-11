@@ -8,28 +8,38 @@
 <h2>Add Questions to {{ assessment.title }}</h2>
 
 <form method="POST">
-    <div id="question-form">
-        <label for="question_text">Question:</label>
-        <textarea name="question_text" id="question_text" rows="3" required></textarea>
-
-        <h4>Answer Options</h4>
-        <div id="answer-options">
-            <div class="option">
-                <label for="answer_options">Option 1:</label>
-                <input type="text" name="answer_options" required>
+    <div class="container mt-5">
+        <h2 class="mb-4">Add Questions to Assessment: {{ assessment.title }}</h2>
+    
+        <form method="POST" action="{{ url_for('add_questions', assessment_id=assessment.id) }}">
+            <!-- CSRF token (if applicable, depending on your security settings) -->
+            <!-- <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> -->
+    
+            <div class="form-group">
+                <label for="question_text">Question</label>
+                <textarea class="form-control" id="question_text" name="question_text" rows="3" placeholder="Enter your question here" required></textarea>
             </div>
-            <div class="option">
-                <label for="answer_options">Option 2:</label>
-                <input type="text" name="answer_options" required>
+    
+            <div class="form-group">
+                <label for="answer_options">Answer Options</label>
+                <input type="text" class="form-control mb-2" id="answer_option1" name="answer_options[]" placeholder="Option 1" required>
+                <input type="text" class="form-control mb-2" id="answer_option2" name="answer_options[]" placeholder="Option 2" required>
+                <input type="text" class="form-control mb-2" id="answer_option3" name="answer_options[]" placeholder="Option 3">
+                <input type="text" class="form-control mb-2" id="answer_option4" name="answer_options[]" placeholder="Option 4">
             </div>
-        </div>
-        <button type="button" onclick="addOption()">Add another option</button>
-
-        <h4>Correct Answer</h4>
-        <input type="text" name="correct_answer" required>
-
+    
+            <div class="form-group">
+                <label for="correct_answer">Correct Answer</label>
+                <input type="text" class="form-control" id="correct_answer" name="correct_answer" placeholder="Specify the correct answer" required>
+            </div>
+    
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Add Question</button>
+                <button type="submit" name="submit_final" value="true" class="btn btn-success">Submit and Finish</button>
+            </div>
+        </form>
     </div>
-
+    {% endblock %}
     <button type="submit" name="add_another">Add Question</button>
     <button type="submit" name="submit">Submit Quiz</button>
 </form>
