@@ -12,8 +12,8 @@
         <h2 class="mb-4">Add Questions to Assessment: {{ assessment.title }}</h2>
     
         <form method="POST" action="{{ url_for('add_questions', assessment_id=assessment.id) }}">
-            <!-- CSRF token (if applicable, depending on your security settings) -->
-            <!-- <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> -->
+            <!-- Include the CSRF token for protection -->
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     
             <div class="form-group">
                 <label for="question_text">Question</label>
