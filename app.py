@@ -4,6 +4,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import db, login_manager
 from models import User, Module, Assessment, Question
+from flask_wtf import CSRFProtect
 
 # Initialize the Flask app and configuration
 app = Flask(__name__)
@@ -13,6 +14,7 @@ app.config['SECRET_KEY'] = 'your_secret_key'
 # Initialize extensions
 db.init_app(app)
 login_manager.init_app(app)
+csrf = CSRFProtect(app)
 
 # Define a simple route to test
 @app.route('/')
