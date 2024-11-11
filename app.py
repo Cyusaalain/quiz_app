@@ -10,11 +10,11 @@ from flask_wtf import CSRFProtect
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quiz_app.db'
 app.config['SECRET_KEY'] = 'your_secret_key'
+csrf = CSRFProtect(app)
 
 # Initialize extensions
 db.init_app(app)
 login_manager.init_app(app)
-csrf = CSRFProtect(app)
 
 # Define a simple route to test
 @app.route('/')
