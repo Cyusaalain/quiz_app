@@ -13,8 +13,8 @@ app.config['SECRET_KEY'] = 'your_secret_key'
 
 # Initialize extensions
 db.init_app(app)
-csrf = CSRFProtect(app)
 login_manager.init_app(app)
+csrf = CSRFProtect(app)
 
 # Define a simple route to test
 @app.route('/')
