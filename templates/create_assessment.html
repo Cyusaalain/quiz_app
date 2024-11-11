@@ -2,23 +2,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Assessment</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <h2>Create Assessment for Module: {{ module.title }}</h2>
-    <form method="POST">
-        <label for="title">Title</label>
-        <input type="text" name="title" required>
-        
-        <label for="terms">Terms</label>
-        <textarea name="terms"></textarea>
-        
-        <label for="time_limit">Time Limit (minutes)</label>
-        <input type="number" name="time_limit" min="1" required>
-    </form>
-    <div>
-    <a href="{{ url_for('add_questions', assessment_id=assessment.id) }}">Add Questions</a>
-    <a href="{{ url_for('module_dashboard', module_id=module.id) }}">Back to Dashboard</a>
+    <div class="container mt-5">
+        <h2>Create a New Assessment for Module: {{ module.title }}</h2>
+        <form method="POST" action="{{ url_for('create_assessment', module_id=module.id) }}">
+            <div class="form-group">
+                <label for="title">Assessment Title</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="terms">Terms and Conditions</label>
+                <textarea class="form-control" id="terms" name="terms" rows="4" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="time_limit">Time Limit (in minutes)</label>
+                <input type="number" class="form-control" id="time_limit" name="time_limit" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit and Add Questions</button>
+        </form>
     </div>
+
+    {% if assessment %}
+        <!-- Display this section if the assessment has just been created -->
+        <div class="mt-4">
+            <h4>Continue to Add Questions:</h4>
+            <a href="{{ url_for('add_questions', assessment_id=assessment.id) }}" class="btn btn-success">Add Questions</a>
+        </div>
+    {% endif %}
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
