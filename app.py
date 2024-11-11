@@ -8,9 +8,9 @@ from flask_wtf import CSRFProtect
 
 # Initialize the Flask app and configuration
 app = Flask(__name__)
+csrf = CSRFProtect(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quiz_app.db'
 app.config['SECRET_KEY'] = 'your_secret_key'
-csrf = CSRFProtect(app)
 
 # Initialize extensions
 db.init_app(app)
