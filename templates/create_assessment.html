@@ -11,6 +11,7 @@
     <div class="container mt-5">
         <h2>Create a New Assessment for Module: {{ module.title }}</h2>
         <form method="POST" action="{{ url_for('create_assessment', module_id=module.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="form-group">
                 <label for="title">Assessment Title</label>
                 <input type="text" class="form-control" id="title" name="title" required>
