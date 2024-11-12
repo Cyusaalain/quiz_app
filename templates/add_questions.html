@@ -33,7 +33,7 @@
         </div>
 
         <div class="mt-4">
-            <button type="submit" name="add_another" class="btn btn-primary">Add Question</button>
+            <button type="submit" name="add_another" class="btn btn-primary">Add another Question</button>
             <button type="submit" name="submit_final" class="btn btn-success">Submit and Finish</button>
             <a href="{{ url_for('edit_previous_question', question_id=session.get('question_count', 0) - 1) }}" class="btn btn-secondary">Edit Previous Question</a>
         </div>

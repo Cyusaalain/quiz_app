@@ -212,13 +212,14 @@ def delete_assessment(assessment_id):
     flash('Assessment and related questions deleted successfully!', 'success')
     return redirect(url_for('module_dashboard'))
 
-#questions route
 @app.route('/assessment/<int:assessment_id>/add_questions', methods=['GET', 'POST'])
 @login_required
 def add_questions(assessment_id):
     if current_user.role != 'admin':
+        flash('You do not have permission to access this page.', 'danger')
         return redirect(url_for('home'))
     
+    # Get the assessment or return 404 if not found
     assessment = Assessment.query.get_or_404(assessment_id)
     
     if request.method == 'POST':
@@ -227,16 +228,22 @@ def add_questions(assessment_id):
         answer_options = request.form.getlist('answer_options')
         correct_answer = request.form.get('correct_answer')
         
-        # Basic validation
+        # Basic validation for empty fields
         if not question_text or not answer_options or not correct_answer:
             flash('Please fill in all fields.', 'danger')
             return redirect(url_for('add_questions', assessment_id=assessment_id))
         
-        # Store question details in session as a dictionary
+        # Ensure that answer_options has values and correct_answer is one of them
+        if correct_answer not in answer_options:
+            flash('The correct answer must be one of the provided answer options.', 'danger')
+            return redirect(url_for('add_questions', assessment_id=assessment_id))
+        
+        # Create a dictionary for the new question
         new_question = {
             'question_text': question_text,
             'answer_options': answer_options,
-            'correct_answer': correct_answer
+            'correct_answer': correct_answer,
+            'assessment_id': assessment.id
         }
         
         # Add the question to the session
@@ -254,17 +261,17 @@ def add_questions(assessment_id):
         if 'submit_final' in request.form:
             # Save all questions from the session to the database
             for question in session['questions']:
-                new_question = Question(
+                db_question = Question(
                     question_text=question['question_text'],
                     answer_options=question['answer_options'],
                     correct_answer=question['correct_answer'],
-                    assessment=assessment
+                    assessment_id=question['assessment_id']
                 )
-                db.session.add(new_question)
+                db.session.add(db_question)
             
             db.session.commit()
             
-            # Clear the session
+            # Clear the session data after saving
             session.pop('questions', None)
             session.pop('question_count', None)
             
@@ -279,7 +286,7 @@ def add_questions(assessment_id):
 def edit_previous_question(question_id):
     if 'questions' not in session or question_id >= len(session['questions']):
         flash('No previous question to edit or invalid question ID.', 'error')
-        return redirect(url_for('add_questions', assessment_id=assessment.id))
+        return redirect(url_for('add_questions', assessment_id=assessment.id)) # type: ignore
     
     question = session['questions'][question_id]
 
