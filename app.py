@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import db, login_manager
 from models import User, Module, Assessment, Question
 from flask_wtf import CSRFProtect
-from flask import session
+import json
 
 # Initialize the Flask app and configuration
 app = Flask(__name__)
@@ -17,7 +17,7 @@ db.init_app(app)
 login_manager.init_app(app)
 csrf = CSRFProtect(app)
 
-# Define a simple route to test
+# home
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -249,15 +249,14 @@ def add_questions(assessment_id):
         
         if 'submit_final' in request.form:
             for question in session['questions']:
-                print("Adding question:", question)
                 db_question = Question(
                     question_text=question['question_text'],
-                    answer_options=question['answer_options'],
+                    answer_options=json.dumps(question['answer_options']),
                     correct_answer=question['correct_answer'],
                     assessment_id=question['assessment_id']
                 )
                 db.session.add(db_question)
-            
+                print("Adding question:", question)
             db.session.commit()
             print("Questions committed to the database.")
             session.pop('questions', None)
