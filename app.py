@@ -267,6 +267,21 @@ def add_questions(assessment_id):
     
     return render_template('add_questions.html', assessment=assessment)
 
+@app.route('/view_questions')
+@login_required
+def view_questions():
+    if current_user.role != 'admin':
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('home'))
+    
+    questions = Question.query.all()
+    
+    if not questions:
+        flash('No questions found in the database.', 'danger')
+        return redirect(url_for('home'))
+    
+    return render_template('view_questions.html', questions=questions)
+
 #edit questions
 @app.route('/edit_previous_question/<int:question_id>', methods=['GET', 'POST'])
 @login_required
