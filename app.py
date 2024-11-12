@@ -285,8 +285,10 @@ def add_questions(assessment_id):
 @login_required
 def edit_previous_question(question_id):
     if 'questions' not in session or question_id >= len(session['questions']):
-        flash('No previous question to edit or invalid question ID.', 'error')
-        return redirect(url_for('add_questions', assessment_id=assessment.id)) # type: ignore
+        flash('No previous question to edit or invalid question ID.', 'danger')
+        # Replace 'assessment_id' if needed or retrieve it dynamically
+        assessment_id = session['questions'][question_id]['assessment_id'] if 'questions' in session else 1
+        return redirect(url_for('add_questions', assessment_id=assessment_id))
     
     question = session['questions'][question_id]
 
@@ -294,6 +296,11 @@ def edit_previous_question(question_id):
         question['question_text'] = request.form.get('question_text')
         question['answer_options'] = request.form.getlist('answer_options')
         question['correct_answer'] = request.form.get('correct_answer')
+
+        if question['correct_answer'] not in question['answer_options']:
+            flash('Correct answer must be one of the provided options.', 'danger')
+            return redirect(url_for('edit_previous_question', question_id=question_id))
+
         session['questions'][question_id] = question
         flash('Question updated successfully.', 'success')
         return redirect(url_for('add_questions', assessment_id=question['assessment_id']))
