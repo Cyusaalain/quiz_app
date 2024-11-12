@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import db, login_manager
 from models import User, Module, Assessment, Question
 from flask_wtf import CSRFProtect
+from flask import session
 
 # Initialize the Flask app and configuration
 app = Flask(__name__)
@@ -231,7 +232,11 @@ def add_questions(assessment_id):
         
         db.session.add(new_question)
         
-        # Check if they want to add more or submit
+        #add more question or submit
+        if 'questions' not in session: 
+            session['questions'] = [] 
+            session['questions'].append(new_question) 
+            session['question_count'] = len(session['questions'])
         if 'add_another' in request.form:
             db.session.commit()
             flash('Question added. Add another question.', 'info')
@@ -243,6 +248,29 @@ def add_questions(assessment_id):
             return redirect(url_for('module_dashboard', module_id=assessment.module_id))
     
     return render_template('add_questions.html', assessment=assessment)
+
+#edit questions
+@app.route('/edit_previous_question/<int:question_id>', methods=['GET', 'POST'])
+@login_required
+def edit_previous_question(question_id):
+    if 'questions' not in session or question_id < 0 or question_id >= len(session['questions']):
+        flash('Invalid question ID or session expired.', 'danger')
+        return redirect(url_for('add_questions', assessment_id=session.get('assessment_id')))
+
+    question = session['questions'][question_id]
+
+    if request.method == 'POST':
+        question['question_text'] = request.form.get('question_text')
+        question['answer_options'] = request.form.getlist('answer_options')
+        question['correct_answer'] = request.form.get('correct_answer')
+
+        session['questions'][question_id] = question
+        session.modified = True 
+
+        flash('Question updated successfully.', 'success')
+        return redirect(url_for('add_questions', assessment_id=session.get('assessment_id')))
+
+    return render_template('edit_question.html', question=question, question_id=question_id)
 
 # User dashboard
 @app.route('/user_dashboard')
