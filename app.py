@@ -219,31 +219,52 @@ def add_questions(assessment_id):
     assessment = Assessment.query.get_or_404(assessment_id)
     
     if request.method == 'POST':
+        # Gather form data
         question_text = request.form.get('question_text')
         answer_options = request.form.getlist('answer_options')
         correct_answer = request.form.get('correct_answer')
         
-        new_question = Question(
-            question_text=question_text,
-            answer_options=answer_options,
-            correct_answer=correct_answer,
-            assessment=assessment
-        )
-        
-        db.session.add(new_question)
-        
-        #add more question or submit
-        if 'questions' not in session: 
-            session['questions'] = [] 
-            session['questions'].append(new_question) 
-            session['question_count'] = len(session['questions'])
-        if 'add_another' in request.form:
-            db.session.commit()
-            flash('Question added. Add another question.', 'info')
+        # Basic validation
+        if not question_text or not answer_options or not correct_answer:
+            flash('Please fill in all fields.', 'danger')
             return redirect(url_for('add_questions', assessment_id=assessment_id))
         
-        if 'submit' in request.form:
+        # Store question details in session as a dictionary
+        new_question = {
+            'question_text': question_text,
+            'answer_options': answer_options,
+            'correct_answer': correct_answer
+        }
+        
+        # Add the question to the session
+        if 'questions' not in session:
+            session['questions'] = []
+        
+        session['questions'].append(new_question)
+        session['question_count'] = len(session['questions'])
+        
+        # Check which button was pressed
+        if 'add_another' in request.form:
+            flash('Question added. You can add another question.', 'info')
+            return redirect(url_for('add_questions', assessment_id=assessment_id))
+        
+        if 'submit_final' in request.form:
+            # Save all questions from the session to the database
+            for question in session['questions']:
+                new_question = Question(
+                    question_text=question['question_text'],
+                    answer_options=question['answer_options'],
+                    correct_answer=question['correct_answer'],
+                    assessment=assessment
+                )
+                db.session.add(new_question)
+            
             db.session.commit()
+            
+            # Clear the session
+            session.pop('questions', None)
+            session.pop('question_count', None)
+            
             flash('Quiz added successfully!', 'success')
             return redirect(url_for('module_dashboard', module_id=assessment.module_id))
     
@@ -253,10 +274,9 @@ def add_questions(assessment_id):
 @app.route('/edit_previous_question/<int:question_id>', methods=['GET', 'POST'])
 @login_required
 def edit_previous_question(question_id):
-    if 'questions' not in session or question_id < 0 or question_id >= len(session['questions']):
+    if 'questions' not in session or question_id >= len(session['questions']):
         flash('Invalid question ID or session expired.', 'danger')
-        return redirect(url_for('add_questions', assessment_id=session.get('assessment_id')))
-
+        return redirect(url_for('add_questions', assessment_id=session.get('assessment_id', 0)))
     question = session['questions'][question_id]
 
     if request.method == 'POST':
@@ -264,11 +284,12 @@ def edit_previous_question(question_id):
         question['answer_options'] = request.form.getlist('answer_options')
         question['correct_answer'] = request.form.get('correct_answer')
 
+        if not question['question_text'] or not question['answer_options'] or not question['correct_answer']:
+            flash('All fields are required to update the question.', 'danger')
+            return redirect(url_for('edit_previous_question', question_id=question_id))
         session['questions'][question_id] = question
-        session.modified = True 
-
         flash('Question updated successfully.', 'success')
-        return redirect(url_for('add_questions', assessment_id=session.get('assessment_id')))
+        return redirect(url_for('add_questions', assessment_id=session.get('assessment_id', 0)))
 
     return render_template('edit_question.html', question=question, question_id=question_id)
 
