@@ -201,13 +201,16 @@ def edit_assessment(assessment_id):
 def delete_assessment(assessment_id):
     if current_user.role != 'admin':
         return redirect(url_for('home'))
-    
+
     assessment = Assessment.query.get_or_404(assessment_id)
+    
+    Question.query.filter_by(assessment_id=assessment_id).delete()
+    
     db.session.delete(assessment)
     db.session.commit()
     
-    flash('Assessment deleted successfully!', 'success')
-    return redirect(url_for('module_dashboard', module_id=assessment.module_id))
+    flash('Assessment and related questions deleted successfully!', 'success')
+    return redirect(url_for('admin_dashboard'))
 
 #questions route
 @app.route('/assessment/<int:assessment_id>/add_questions', methods=['GET', 'POST'])
