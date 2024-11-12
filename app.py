@@ -278,21 +278,18 @@ def add_questions(assessment_id):
 @login_required
 def edit_previous_question(question_id):
     if 'questions' not in session or question_id >= len(session['questions']):
-        flash('Invalid question ID or session expired.', 'danger')
-        return redirect(url_for('add_questions', assessment_id=session.get('assessment_id', 0)))
+        flash('No previous question to edit or invalid question ID.', 'error')
+        return redirect(url_for('add_questions', assessment_id=assessment.id))
+    
     question = session['questions'][question_id]
 
     if request.method == 'POST':
         question['question_text'] = request.form.get('question_text')
         question['answer_options'] = request.form.getlist('answer_options')
         question['correct_answer'] = request.form.get('correct_answer')
-
-        if not question['question_text'] or not question['answer_options'] or not question['correct_answer']:
-            flash('All fields are required to update the question.', 'danger')
-            return redirect(url_for('edit_previous_question', question_id=question_id))
         session['questions'][question_id] = question
         flash('Question updated successfully.', 'success')
-        return redirect(url_for('add_questions', assessment_id=session.get('assessment_id', 0)))
+        return redirect(url_for('add_questions', assessment_id=question['assessment_id']))
 
     return render_template('edit_question.html', question=question, question_id=question_id)
 
