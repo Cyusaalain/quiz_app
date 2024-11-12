@@ -249,6 +249,7 @@ def add_questions(assessment_id):
         
         if 'submit_final' in request.form:
             for question in session['questions']:
+                print("Adding question:", question)
                 db_question = Question(
                     question_text=question['question_text'],
                     answer_options=question['answer_options'],
@@ -258,6 +259,7 @@ def add_questions(assessment_id):
                 db.session.add(db_question)
             
             db.session.commit()
+            print("Questions committed to the database.")
             session.pop('questions', None)
             session.pop('question_count', None)
             
