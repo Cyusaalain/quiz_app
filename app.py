@@ -210,7 +210,7 @@ def delete_assessment(assessment_id):
     db.session.commit()
     
     flash('Assessment and related questions deleted successfully!', 'success')
-    return redirect(url_for('admin_dashboard'))
+    return redirect(url_for('module_dashboard'))
 
 #questions route
 @app.route('/assessment/<int:assessment_id>/add_questions', methods=['GET', 'POST'])
